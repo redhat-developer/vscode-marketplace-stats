@@ -1,0 +1,25 @@
+{#include base}
+    {#content}
+    <div class="row row-cards-pf ">
+        {#if !extensions.size}
+            No extensions loaded yet!
+        {/}
+        {#each extensions}
+        <div class="col-xs-6 col-sm-4 col-md-3">
+            <!-- Aggregated status card -->
+            <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title extension-title">
+                    <a href="{it.name}.html">
+                        {#if it.icon}<img src="{it.icon}" class="extension-list" />{/if}
+                        {#if it.displayName} {it.displayName} {#else} {it.name} {/if}
+                    </a>
+                </h2>
+                <div class="card-pf-body">
+                    <a href="{it.name}.csv" class="pficon-export" title="Raw Data (CSV)"></a>
+                </div>
+            </div>
+        </div>
+        {/each}
+    </div>
+    {/}
+{/include}

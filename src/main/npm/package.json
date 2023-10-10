@@ -1,0 +1,10 @@
+{
+  "name": "vscode-marketplace-statistics",
+  "version": "0.3.0",
+  "description": "VS Code Marketplace statistics tracker",
+  "author": "Fred Bricon",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "patternfly": "^3.59.5"
+  }
+}

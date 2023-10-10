@@ -1,0 +1,161 @@
+{#include base}
+    {#content}
+    <div class="row row-cards-pf">
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="card-pf card-pf-utilization">
+                <h2 class="card-pf-title extension-title">
+                    {#if extension.icon}<img src="{extension.icon}" />{/if}
+                    <a href="https://marketplace.visualstudio.com/items?itemName={extension.name}" target="_blank">
+                        {extension.displayName.or(extension.name)}
+                    </a>
+                </h2>
+                <div class="card-pf-body">
+                    <p class="card-pf-utilization-details">
+                        <span class="card-pf-utilization-card-details-count" id="value"></span>
+                        <span class="card-pf-utilization-card-details-line-1"><a href="{extension.name}.csv" class="pficon-export"
+                                                                                 title="Raw Data (CSV)"></a></span>
+                    </p>
+                    <div class="chart-pf-sparkline" id="container"></div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /row -->
+    {/}
+
+    {#scripts}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/4.1.7/highcharts.js"></script>
+    <script>
+        function toPoint(data) {
+            return [
+                new Date(data.time).getTime(),
+                data.total_installed
+            ];
+        }
+
+        var chart;
+        $(document).ready(async function () {
+            //const series = fetchData();
+            Highcharts.setOptions({
+                global: {
+                    useUTC: false
+                }
+            });
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container',
+                    //type: 'spline',
+                    zoomType: 'x',
+                    resetZoomButton: {
+                        position: {
+                            align: 'left',
+                            verticalAlign: 'top', // by default
+                            x: 10,
+                            y: 10
+                        },
+                        relativeTo: 'chart'
+                    },
+                    animation: Highcharts.svg, // don't animate in old IE
+                    marginRight: 10,
+                },
+                title: {
+                    text: ''//'redhat.java installations'
+                },
+                xAxis: {
+                    type: 'datetime'//,
+                    //tickPixelInterval: 150
+                },
+                yAxis: {
+                    title: {
+                        text: 'Installs'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                legend: {
+                    enabled: false
+                },
+                exporting: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        marker: {
+                            radius: 2
+                        },
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                lineWidth: 1
+                            }
+                        },
+                        threshold: null
+                    }
+                },
+                series: await fetchData()
+            });
+        });
+
+        async function fetchData() {
+            var start = Date.now();
+            var response = await fetch('/stats/{extension.name}');
+            var versions = JSON.parse(await response.text());
+            var i = 0;
+            var data = null;
+            var point = null;
+            var latest = null;
+            var series = [];
+            var startVersion = 0;
+            var stopVersion = 0;
+            var elapsedVersion = 0;
+            for (var l = versions.length; i < l; i++) {
+                startVersion = Date.now();
+                var version = versions[i];
+                data = [];
+                for (var z = version.events.length, j = 0; j < z; j++) {
+                    point = toPoint(version.events[j]);
+                    data.push(point);
+                    if (latest == null || latest[0] < point[0]) {
+                        latest = point;
+                    }
+                }
+                var serie = {
+                    name: version._id,
+                    data: data
+                }
+                series.push(serie);
+                stopVersion = Date.now();
+                elapsedVersion = stopVersion - startVersion;
+                //chart.redraw();
+                console.log("Loaded " + serie.name + " in "+elapsedVersion+"ms");
+            }
+            if (latest !== null) {
+                $("#value").html(format(latest[1])+" downloads");
+            }
+            var elapsed = new Date().getTime() - start;
+            console.log("Loaded " + i + " data points in " + elapsed + "ms");
+            return series;
+        }
+
+        function format(value) {
+            return value.toLocaleString(
+                undefined, // use a string like 'en-US' to override browser locale
+            );
+        }
+    </script>
+    {/}
+{/}

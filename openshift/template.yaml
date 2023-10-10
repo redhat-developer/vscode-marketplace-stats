@@ -1,0 +1,191 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: vscode-marketplace-stats
+objects:
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    metadata:
+      name: vscode-marketplace-stats
+      labels:
+        service: vscode-marketplace-stats
+    spec:
+      replicas: ${{REPLICAS}}
+      selector:
+        service: vscode-marketplace-stats
+      strategy:
+        rollingParams:
+          intervalSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            service: vscode-marketplace-stats
+        spec:
+          serviceAccount: ${SERVICE_ACCOUNT}
+          serviceAccountName: ${SERVICE_ACCOUNT}
+          containers:
+            - image: ${IMAGE}:${IMAGE_TAG}
+              imagePullPolicy: Always
+              name: app
+              ports:
+                - containerPort: 8080
+              livenessProbe:
+                httpGet:
+                  path: /q/health/live
+                  port: 8080
+                initialDelaySeconds: 15
+                periodSeconds: 10
+                timeoutSeconds: 3
+              readinessProbe:
+                httpGet:
+                  path: /q/health/ready
+                  port: 8080
+                initialDelaySeconds: 15
+                periodSeconds: 10
+                timeoutSeconds: 3
+              resources:
+                requests:
+                  cpu: ${CPU_REQUEST}
+                  memory: ${MEMORY_REQUEST}
+                limits:
+                  cpu: ${CPU_LIMIT}
+                  memory: ${MEMORY_LIMIT}
+              env:
+                - name: MARKETPLACE_DB_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketplace-db
+                      key: database-host
+                - name: MARKETPLACE_DB_PORT
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketplace-db
+                      key: database-port
+                - name: MARKETPLACE_DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketplace-db
+                      key: database-name
+                - name: QUARKUS_DATASOURCE_JDBC_URL
+                  value: 'jdbc:postgresql://${MARKETPLACE_DB_HOST}:${MARKETPLACE_DB_PORT}/${MARKETPLACE_DB_NAME}'
+                - name: QUARKUS_DATASOURCE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketplace-db
+                      key: database-user
+                - name: QUARKUS_DATASOURCE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: marketplace-db
+                      key: database-password
+                - name: TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: application-secrets
+                      key: access-token
+                - name: READ_ONLY
+                  valueFrom:
+                    configMapKeyRef:
+                      name: application-config
+                      key: READ_ONLY
+      triggers:
+        - type: ConfigChange
+        - type: "ImageChange" 
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - "app"
+            from:
+              kind: "ImageStreamTag"
+              name: "vscode-marketplace-stats-app:latest"
+          strategy: 
+            type: "Rolling"
+          paused: false 
+          revisionHistoryLimit: 2 
+          minReadySeconds: 0
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: vscode-marketplace-stats-app
+      labels:
+        service: vscode-marketplace-stats
+    spec:
+      lookupPolicy:
+        local: false
+      tags:
+      - annotations: null
+        from:
+          kind: DockerImage
+          name: ${IMAGE}:${IMAGE_TAG}
+        importPolicy:
+          importMode: Legacy
+        name: latest
+        referencePolicy:
+          type: Source
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        service: vscode-marketplace-stats
+      name: vscode-marketplace-stats
+    spec:
+      ports:
+        - name: '8080'
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        service: vscode-marketplace-stats
+      sessionAffinity: None
+      type: ClusterIP
+  - kind: Route
+    apiVersion: route.openshift.io/v1
+    metadata:
+      labels:
+        app: vscode-marketplace-stats
+        app.kubernetes.io/component: vscode-marketplace-stats
+        app.kubernetes.io/instance: vscode-marketplace-stats
+        service: vscode-marketplace-stats
+      name: ${ROUTE_NAME}
+    spec:
+      port:
+        targetPort: 8080
+      tls:
+        termination: edge
+      to:
+        kind: ""
+        name: vscode-marketplace-stats
+parameters:
+  - name: IMAGE
+    value: docker.io/fbricon/vscode-marketplace-stats
+    required: true
+  - name: IMAGE_TAG
+    value: latest
+    required: true
+  - name: CPU_REQUEST
+    required: true
+    value: 400m
+  - name: CPU_LIMIT
+    required: true
+    value: 1000m
+  - name: MEMORY_REQUEST
+    required: true
+    value: 256Mi
+  - displayName: Memory limit
+    required: true
+    name: MEMORY_LIMIT
+    value: 1Gi
+  - name: REPLICAS
+    required: true
+    value: '1'
+  - name: SERVICE_ACCOUNT
+    required: true
+    value: 'github-sa'
+  - name: ROUTE_NAME
+    required: true
+    value: 'vscode-marketplace-stats'

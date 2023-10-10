@@ -1,0 +1,15 @@
+.extension-title > img {
+    width: 40px
+}
+
+img.extension-list {
+    height: 40px
+}
+
+.nav-img {
+    width: 20px
+}
+
+.extension-title {
+    text-align:left;
+}

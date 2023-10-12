@@ -34,4 +34,4 @@ jobs:
           cache: 'maven'
       - name: Build
         run: |
-          ./mvnw clean integration-test -Dnative
+          ./mvnw clean integration-test -Dnative -Pmvnpm

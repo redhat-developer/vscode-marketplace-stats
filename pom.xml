@@ -81,13 +81,13 @@
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--
     <dependency>
       <groupId>io.quarkiverse.web-bundler</groupId>
       <artifactId>quarkus-web-bundler</artifactId>
       <version>1.1.1</version>
     </dependency>
     
+    <!--
     <dependency>
       <groupId>org.mvnpm</groupId>
       <artifactId>patternfly</artifactId>

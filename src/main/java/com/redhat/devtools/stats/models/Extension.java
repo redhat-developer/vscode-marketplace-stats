@@ -15,7 +15,6 @@
  */
 package com.redhat.devtools.stats.models;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.redhat.devtools</groupId>
   <artifactId>vscode-marketplace-stats</artifactId>
@@ -24,6 +26,21 @@
         <version>${quarkus.platform.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>patternfly</artifactId>
+        <version>3.59.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>jquery</artifactId>
+        <version>3.7.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>d3</artifactId>
+        <version>3.5.17</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -90,7 +107,7 @@
     <dependency>
       <groupId>org.mvnpm</groupId>
       <artifactId>patternfly</artifactId>
-      <version>3.59.5</version>
+      <scope>runtime</scope>
     </dependency>
     -->
     <dependency>
@@ -118,10 +135,13 @@
           <include>**/jquery-match-height/dist/*-min.js</include>
           <include>**/bootstrap-switch/dist/js/*.min.js</include>
           <include>**/datatables.net-colreorder/js/*.min.js</include>
-          <include>**/patternfly/dist/css/*.min.css</include>
-          <include>**/patternfly/dist/fonts/*</include>
-          <include>**/patternfly/dist/js/patternfly.min.js</include>
-        </includes>
+          <!-- 
+
+            <include>**/patternfly/dist/css/*.min.css</include>
+            <include>**/patternfly/dist/fonts/*</include>
+            <include>**/patternfly/dist/js/patternfly.min.js</include>
+          -->
+          </includes>
         <targetPath>META-INF/resources/</targetPath>
       </resource>
     </resources>
@@ -235,5 +255,5 @@
         <quarkus.package.type>native</quarkus.package.type>
       </properties>
     </profile>
-    </profiles>
+  </profiles>
 </project>

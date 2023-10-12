@@ -8,11 +8,11 @@ objects:
     metadata:
       name: vscode-marketplace-stats
       labels:
-        service: vscode-marketplace-stats
+        app: vscode-marketplace-stats
     spec:
       replicas: ${{REPLICAS}}
       selector:
-        service: vscode-marketplace-stats
+        app: vscode-marketplace-stats
       strategy:
         rollingParams:
           intervalSeconds: 1
@@ -24,7 +24,7 @@ objects:
       template:
         metadata:
           labels:
-            service: vscode-marketplace-stats
+            app: vscode-marketplace-stats
         spec:
           serviceAccount: ${SERVICE_ACCOUNT}
           serviceAccountName: ${SERVICE_ACCOUNT}
@@ -113,7 +113,7 @@ objects:
     metadata:
       name: vscode-marketplace-stats-app
       labels:
-        service: vscode-marketplace-stats
+        app: vscode-marketplace-stats
     spec:
       lookupPolicy:
         local: false
@@ -131,7 +131,7 @@ objects:
     apiVersion: v1
     metadata:
       labels:
-        service: vscode-marketplace-stats
+        app: vscode-marketplace-stats
       name: vscode-marketplace-stats
     spec:
       ports:
@@ -140,7 +140,7 @@ objects:
           protocol: TCP
           targetPort: 8080
       selector:
-        service: vscode-marketplace-stats
+        app: vscode-marketplace-stats
       sessionAffinity: None
       type: ClusterIP
   - kind: Route
@@ -150,7 +150,6 @@ objects:
         app: vscode-marketplace-stats
         app.kubernetes.io/component: vscode-marketplace-stats
         app.kubernetes.io/instance: vscode-marketplace-stats
-        service: vscode-marketplace-stats
       name: ${ROUTE_NAME}
     spec:
       port:

@@ -81,13 +81,12 @@
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--
     <dependency>
       <groupId>io.quarkiverse.web-bundler</groupId>
       <artifactId>quarkus-web-bundler</artifactId>
       <version>1.1.1</version>
     </dependency>
-    
+    <!--
     <dependency>
       <groupId>org.mvnpm</groupId>
       <artifactId>patternfly</artifactId>
@@ -102,6 +101,9 @@
   </dependencies>
   <build>
     <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
       <!-- Ideally, we should optimize UI dependencies via webpack or something -->
       <resource>
         <directory>src/main/npm</directory>
@@ -121,9 +123,6 @@
           <include>**/patternfly/dist/js/patternfly.min.js</include>
         </includes>
         <targetPath>META-INF/resources/</targetPath>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
       </resource>
     </resources>
     <plugins>

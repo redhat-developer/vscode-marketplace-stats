@@ -20,7 +20,7 @@
     <meta charset="utf-8">
     <title>VS Code Marketplace</title>
 
-    {#bundle /}
+    {#bundle tag="style" /}
     <script>
         var origin = window.location.origin;
     </script>
@@ -69,7 +69,7 @@
     {/insert}
 </div>
 
-
+    {#bundle tag="script" /}
     {#insert scripts /}
 
     </body>

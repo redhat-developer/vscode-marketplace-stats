@@ -60,11 +60,6 @@
       <dependency>
         <groupId>org.mvnpm</groupId>
         <artifactId>moment-timezone</artifactId>
-        <version>2.29.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mvnpm</groupId>
-        <artifactId>moment-timezone</artifactId>
         <version>0.5.43</version>
       </dependency>
     </dependencies>
@@ -126,7 +121,7 @@
     <dependency>
       <groupId>io.quarkiverse.web-bundler</groupId>
       <artifactId>quarkus-web-bundler</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.5</version>
     </dependency>
     <dependency>
       <groupId>org.mvnpm</groupId>
@@ -137,6 +132,11 @@
       <groupId>org.mvnpm</groupId>
       <artifactId>datatables</artifactId>
       <version>1.10.18</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mvnpm</groupId>
+      <artifactId>highcharts</artifactId>
+      <version>4.2.0</version>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
@@ -202,19 +202,21 @@
       </plugin>
     </plugins>
   </build>
-  <!--
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>mvnpm.org</id>
-      <name>mvnpm</name>
-      <url>https://repo.mvnpm.org/maven2</url>
-    </repository>
-  </repositories>
-  -->
+   
   <profiles>
+    <profile>
+      <id>mvnpm</id>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>mvnpm.org</id>
+          <name>mvnpm</name>
+          <url>https://repo.mvnpm.org/maven2</url>
+        </repository>
+      </repositories>
+    </profile>
     <profile>
       <id>native</id>
       <activation>

@@ -42,6 +42,31 @@
         <artifactId>d3</artifactId>
         <version>3.5.17</version>
       </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>d3-axis</artifactId>
+        <version>3.5.17</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>d3-scale</artifactId>
+        <version>4.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>moment</artifactId>
+        <version>2.29.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>moment-timezone</artifactId>
+        <version>2.29.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>moment-timezone</artifactId>
+        <version>0.5.43</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -103,13 +128,16 @@
       <artifactId>quarkus-web-bundler</artifactId>
       <version>1.1.1</version>
     </dependency>
-    <!--
     <dependency>
       <groupId>org.mvnpm</groupId>
       <artifactId>patternfly</artifactId>
-      <scope>runtime</scope>
+      <version>3.59.5</version>
     </dependency>
-    -->
+    <dependency>
+      <groupId>org.mvnpm</groupId>
+      <artifactId>datatables</artifactId>
+      <version>1.10.18</version>
+    </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
@@ -117,34 +145,6 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-      <!-- Ideally, we should optimize UI dependencies via webpack or something -->
-      <resource>
-        <directory>src/main/npm</directory>
-        <includes>
-          <include>**/jquery/dist/*.min.js</include>
-          <include>**/bootstrap/dist/js/*.min.js</include>
-          <include>**/datatables.net/js/*.min.js</include>
-          <include>**/drmonty-datatables-colvis/js/*.min.js</include>
-          <include>**/datatables.net-colreorder/js/*.min.js</include>
-          <include>**/bootstrap-switch/dist/js/*.min.js</include>
-          <include>**/bootstrap-touchspin/dist/*.min.js</include>
-          <include>**/jquery-match-height/dist/*-min.js</include>
-          <include>**/bootstrap-switch/dist/js/*.min.js</include>
-          <include>**/datatables.net-colreorder/js/*.min.js</include>
-          <!-- 
-
-            <include>**/patternfly/dist/css/*.min.css</include>
-            <include>**/patternfly/dist/fonts/*</include>
-            <include>**/patternfly/dist/js/patternfly.min.js</include>
-          -->
-          </includes>
-        <targetPath>META-INF/resources/</targetPath>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
@@ -170,35 +170,7 @@
           </compilerArgs>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.14.0</version>
-        <configuration>
-          <nodeVersion>v18.18.0</nodeVersion>
-          <installDirectory>src/main/node/</installDirectory>
-          <workingDirectory>src/main/npm/</workingDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <id>install node and npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <phase>generate-resources</phase>
-          </execution>
-          <execution>
-            <id>npm install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <arguments>install</arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire-plugin.version}</version>

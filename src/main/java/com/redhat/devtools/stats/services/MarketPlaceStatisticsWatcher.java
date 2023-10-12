@@ -32,7 +32,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 import static com.redhat.devtools.stats.utils.JsonUtils.*;

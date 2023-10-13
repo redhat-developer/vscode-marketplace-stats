@@ -50,6 +50,22 @@ public class Extension extends PanacheEntityBase {
         return find("name", name).firstResult();
     }
 
+    public static record ExtensionDto (Extension extension, Integer totalInstalls){};
+
+    public static List<ExtensionDto> findActiveSortedByPopularity() {
+        String query = """
+            select e, totalInstalls FROM Extension e
+            LEFT JOIN LATERAL (
+                SELECT ei.extension.id AS extId, max(ei.time) as latest, max(ei.total_installs) as totalInstalls
+                FROM ExtensionInstall ei
+                GROUP BY extId
+            ) as popular ON e.id = extId
+            where e.active = true
+            order by totalInstalls DESC
+        """;
+        return find(query).project(ExtensionDto.class).list();
+    }
+
     @Override
     public String toString() {
         return name;

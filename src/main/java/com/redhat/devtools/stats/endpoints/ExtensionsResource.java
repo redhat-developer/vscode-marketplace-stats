@@ -17,6 +17,7 @@ package com.redhat.devtools.stats.endpoints;
 
 import com.redhat.devtools.stats.models.Extension;
 import com.redhat.devtools.stats.models.ExtensionInstall;
+import com.redhat.devtools.stats.models.Extension.ExtensionDto;
 import com.redhat.devtools.stats.services.MarketPlaceStatisticsWatcher;
 import io.quarkus.logging.Log;
 import io.quarkus.qute.CheckedTemplate;
@@ -51,7 +52,7 @@ public class ExtensionsResource {
     @Path("index.html")
     public TemplateInstance index() {
         long start = System.currentTimeMillis();
-        List<Extension> extensions = Extension.findActive();
+        List<ExtensionDto> extensions = Extension.findActiveSortedByPopularity();
         Log.infov("Fetched data in {0} ms", System.currentTimeMillis() - start);
         return Templates.index(extensions);
     }
@@ -198,7 +199,7 @@ public class ExtensionsResource {
 
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance index(List<Extension> extensions);
+        public static native TemplateInstance index(List<ExtensionDto> extensions);
 
         public static native TemplateInstance details(Extension extension);
     }

@@ -17,6 +17,7 @@ package com.redhat.devtools.stats.models;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -50,6 +51,7 @@ public class Extension extends PanacheEntityBase {
         return find("name", name).firstResult();
     }
 
+    @RegisterForReflection
     public static record ExtensionDto (Extension extension, Integer totalInstalls){};
 
     public static List<ExtensionDto> findActiveSortedByPopularity() {

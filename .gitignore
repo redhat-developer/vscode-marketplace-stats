@@ -17,6 +17,8 @@ bin/
 *.ipr
 *.iml
 *.iws
+# Keep project icon!
+!.idea/icon.*
 
 # NetBeans
 nb-configuration.xml

@@ -8,14 +8,28 @@
                     <a href="https://marketplace.visualstudio.com/items?itemName={extension.name}" target="_blank">
                         {extension.displayName.or(extension.name)}
                     </a>
+                    <span class="card-pf-utilization-card-details-line-1"><a href="{extension.name}.csv" class="pficon-export" title="Raw Data (CSV)"></a></span>
                 </h2>
                 <div class="card-pf-body">
-                    <p class="card-pf-utilization-details">
-                        <span class="card-pf-utilization-card-details-count" id="value"></span>
-                        <span class="card-pf-utilization-card-details-line-1"><a href="{extension.name}.csv" class="pficon-export"
-                                                                                 title="Raw Data (CSV)"></a></span>
-                    </p>
-                    <div class="chart-pf-sparkline" id="container"></div>
+                    <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#installs" data-tab="installs" >Installs</a></li>
+                            <li><a data-toggle="tab" href="#total_installed" data-tab="total_installed" >Total downloads</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="installs" data-title="Installs" class="tab-pane fade in active">
+                            <p class="card-pf-utilization-details">
+                                <span class="card-pf-utilization-card-details-count" id="installs-value"></span>
+                            </p>
+                            <div class="chart-pf-sparkline" id="installs-container">Loading...</div>
+                        </div>
+                        <div id="total_installed" data-title="Total downloads" class="tab-pane fade">
+                            <p class="card-pf-utilization-details">
+                                <span class="card-pf-utilization-card-details-count" id="total_installed-value"></span>
+                            </p>
+                            <div class="chart-pf-sparkline" id="total_installed-container">Loading...</div>
+                        </div>
+                    </div>
+                   
                 </div>
             </div>
         </div>
@@ -25,24 +39,48 @@
     {#scripts}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/4.1.7/highcharts.js"></script>
     <script>
+        var promiseCache = {};
+        function fetchAndUpdateContent(tabId) {
+            if (!promiseCache[tabId]) {
+                // Create a new promise if it doesn't exist in the cache
+                promiseCache[tabId] = fetchData(tabId)
+                    .then(function (data) {
+                        // Update the tab content with the fetched data
+                        renderChart(tabId, data);
+                    })
+            }
+        }
+
         function toPoint(data) {
             return [
                 new Date(data.time).getTime(),
-                data.total_installed
+                data.installs? data.installs : data.total_installed
             ];
         }
 
-        var chart;
+        
         $(document).ready(async function () {
-            //const series = fetchData();
             Highcharts.setOptions({
                 global: {
                     useUTC: true
                 }
             });
-            chart = new Highcharts.Chart({
+            // Event handler for tab clicks
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var tab = e.target.getAttribute('data-tab');
+                fetchAndUpdateContent(tab);
+            });
+
+            // Fetch and update the content for the active tab when the page loads
+            var activeTab = $('.nav-tabs .active a').data('tab');
+            fetchAndUpdateContent(activeTab);
+        });
+
+        function renderChart(tabId, series) {
+            var title = $(tabId).attr('data-title')
+            var chart = new Highcharts.Chart({
                 chart: {
-                    renderTo: 'container',
+                    renderTo: tabId+"-container",
                     //type: 'spline',
                     zoomType: 'x',
                     resetZoomButton: {
@@ -58,15 +96,14 @@
                     marginRight: 10,
                 },
                 title: {
-                    text: ''//'redhat.java installations'
+                    text: title//'redhat.java installations'
                 },
                 xAxis: {
                     type: 'datetime'//,
-                    //tickPixelInterval: 150
                 },
                 yAxis: {
                     title: {
-                        text: 'Installs'
+                        text: title
                     },
                     floor: 0,
                     plotLines: [{
@@ -107,13 +144,13 @@
                         threshold: null
                     }
                 },
-                series: await fetchData()
+                series: series
             });
-        });
+        }
 
-        async function fetchData() {
+        async function fetchData(tabId) {
             var start = Date.now();
-            var response = await fetch('/stats/{extension.name}');
+            var response = await fetch('/stats/{extension.name}?stats=time&stats='+tabId);
             var versions = JSON.parse(await response.text());
             var i = 0;
             var data = null;
@@ -145,10 +182,11 @@
                 console.log("Loaded " + serie.name + " in "+elapsedVersion+"ms");
             }
             if (latest !== null) {
-                $("#value").html(format(latest[1])+" downloads");
+                var label = $("#"+tabId).attr("data-title")
+                $("#"+tabId+"-value").html(format(latest[1])+" "+label);
             }
             var elapsed = new Date().getTime() - start;
-            console.log("Loaded " + i + " data points in " + elapsed + "ms");
+            console.log("Loaded " + i + " data points for "+tabId+" in " + elapsed + "ms");
             return series;
         }
 

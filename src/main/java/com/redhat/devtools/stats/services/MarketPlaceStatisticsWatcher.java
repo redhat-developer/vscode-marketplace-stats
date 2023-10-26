@@ -164,7 +164,7 @@ public class MarketPlaceStatisticsWatcher {
                 yield new ExtensionInstall();
             }
             default -> { // If last seen installs is from the same day and same version, reuse it, else return a new one
-                ExtensionInstall prevInstalls = lastInstalls.get(1);
+                ExtensionInstall prevInstalls = lastInstalls.get(0);
                 delta = totalInstalled - prevInstalls.total_installs;
                 yield (version.equals(prevInstalls.version) && isSameDay(now, prevInstalls.time))? prevInstalls: new ExtensionInstall();
             }
